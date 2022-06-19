@@ -12,7 +12,7 @@ public class HelloController {
     @GetMapping("/api/foos")
     @ResponseBody
     public String getFoos(@RequestParam String val) {
-        String result = "QueryStringValue: " + val;
+        String result = "DEMO FOR MULTISTAGE BUILD - " + val;
         System.out.println(result);
         return result;
     }
