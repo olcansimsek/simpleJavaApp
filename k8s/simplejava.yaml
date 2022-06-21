@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: simplejava
+  namespace: simplejava
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: simplejava
+  template:
+    metadata:
+      labels:
+        name: simplejava
+    spec:
+      containers:
+      - image: olcansimsek/javaapp:latest
+        name: simplejava
+        ports:
+        - containerPort: 9001
+          protocol: TCP
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: simplejava
+  name: simplejava
+  namespace: simplejava
+spec:
+  selector:
+    name: simplejava
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9001
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: simplejava-ingress
+  namespace: simplejava
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /api/foos$1
+spec:
+  defaultBackend:
+    service:
+      name: simplejava
+      port:
+        number: 80
+  rules:
+  - host: simplejava.com
+    http:
+      paths:
+      - path: /api/foos(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: simplejava
+            port:
+              number: 80
+
